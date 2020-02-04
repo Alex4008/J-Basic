@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 public class Main {
 	
 	// Global variables
-	static double version = 0.0;
+	static double version = 0.1;
 	static boolean enableGUI = true;
 	
 	static JFrame editor;
