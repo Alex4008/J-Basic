@@ -167,7 +167,6 @@ public class TextEditor extends JFrame {
 	}
 
 	class SaveAsButtonClick implements ActionListener {
-
 		public void actionPerformed(ActionEvent arg0) {
 			newSave();
 		}
@@ -204,7 +203,6 @@ public class TextEditor extends JFrame {
 			if(!saveFileLocation.endsWith(".jb")) {
 				saveFileLocation += ".jb"; // Add the J-Basic extention
 			}
-			
 			File file = new File(saveFileLocation);
 			try {
 				PrintWriter writer = new PrintWriter(file);
@@ -215,7 +213,6 @@ public class TextEditor extends JFrame {
 			} catch (FileNotFoundException e) {
 				System.out.println("Error 2 TextEditor.java");
 			}
-
 			label.setText(file.getName());
 		}
 	}
