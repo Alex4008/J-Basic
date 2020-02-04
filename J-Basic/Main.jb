@@ -1,0 +1,40 @@
+// This is a J-Basic file. 
+
+//Variables
+int varName;
+integer varName2 = 10;
+string strName = "String";
+str strName2 = ""This is a string"";
+boolean bool = true;
+bool bool2 = 0;
+
+//Methods / functions
+
+Create Method MethodName
+Include String name
+Include integer name
+
+EndMethod;
+
+
+//Graphics
+Create Screen Size (1080, 720);
+
+Draw Color at (10, 10);
+
+Draw "Some text here" at (10,10);
+
+
+
+// Loops
+Run 5 
+
+End Run
+
+RunUntil (x > y) 
+
+EndRun
+
+Run While (x == x)
+
+EndRun
