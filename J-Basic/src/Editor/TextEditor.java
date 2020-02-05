@@ -18,6 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import jBasic.JBasicRunner;
+
 public class TextEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel buttonPanel;
@@ -142,7 +144,6 @@ public class TextEditor extends JFrame {
 	class SaveButtonClick implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) { 
-
 			if(label.getText() == "Untitled.jb") { 
 				newSave();	
 			}
@@ -174,11 +175,28 @@ public class TextEditor extends JFrame {
 	
 	class RunProgramButtonClick implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			JOptionPane.showMessageDialog(Main.editor,
-				    "This feature is coming soon. For now, you can only save programs!",
-				    "Invalid Operation",
-				    JOptionPane.ERROR_MESSAGE);
-			System.out.println("Coming soon!");
+			// Save the file before running it
+			if(label.getText() == "Untitled.jb") { 
+				newSave();	
+			}
+			else { 
+				String saveFileLocation = label.getText();
+				File file = new File(saveFileLocation);
+				try {
+					PrintWriter writer = new PrintWriter(file);
+					for(String line: textArea.getText().split("\n")) { 
+						writer.println(line); 
+					}
+					writer.close();
+
+				} catch (FileNotFoundException e) {
+					System.out.println("Error in TextEditor.Java");
+				}
+
+				label.setText(saveFileLocation);
+				System.out.println("Running JBasic File " + saveFileLocation + ": ");
+				JBasicRunner runner = new JBasicRunner(saveFileLocation);
+			}
 		}
 	}
 	
