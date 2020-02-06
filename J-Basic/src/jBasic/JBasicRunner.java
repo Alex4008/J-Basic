@@ -44,6 +44,22 @@ public class JBasicRunner {
 						break;
 					}	
 				}
+				// STRINGS
+				else if(lineSplit[0].toLowerCase().contains("str")) {
+					try {
+						if(lineSplit.length > 2) { // in this case the variable was also initialized
+							variables.addString(lineSplit[1], lineSplit[3].substring(1, lineSplit[3].length() - 1)); // Add integer to container
+						}
+						else { //The variable was not initialized
+							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized int variable 
+						}
+						
+					} catch (Exception e) {
+						System.out.println("string defined error");
+						e.printStackTrace();
+						break;
+					}	
+				}
 				// PRINT STATEMENTS
 				else if(lineSplit[0].toLowerCase().contains("print")) {
 					String printStatement = "";
