@@ -2,7 +2,6 @@ package jBasic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class JBasicRunner {
@@ -17,6 +16,51 @@ public class JBasicRunner {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * A method that takes a line and removes quotes and formats
+	 * it into a usable string.
+	 * @param lineSplit - the array of args from the line
+	 * @return A formated string
+	 */
+	private String processIntoString(String[] lineSplit, int startingPos) {
+		// Loop through line and print all variables / statements in quotes
+		boolean midQuote = false;
+		String printStatement = "";
+		for(int i = startingPos; i < lineSplit.length; i++) {
+			lineSplit[i] = lineSplit[i].trim();
+			if(lineSplit[i].equals("")) {
+				printStatement += " ";
+			}
+			else if(lineSplit[i].charAt(0) == '"' && lineSplit[i].length() > 1 && lineSplit[i].charAt(lineSplit[i].length() - 1) == '"') { //Then this is a one word quote, remove both
+				printStatement += lineSplit[i].substring(1, lineSplit[i].length() - 1);
+			}
+			else if(lineSplit[i].contains("\"")) { // Then this is a non var
+				midQuote = !midQuote;
+				if(midQuote) printStatement += lineSplit[i].substring(1) + " "; // The start of the quotes
+				else printStatement += lineSplit[i].substring(0, lineSplit[i].length() - 1); //At the end of the quotes
+			}
+			else if(midQuote) { //If we are mid quote, then its NOT a variable.
+				printStatement += lineSplit[i] + " "; // Add a space since split removed it
+			}
+			else { // This should be a var, verify.
+				if (variables.getVariable(lineSplit[i]) != null) { //If this is not null, than the variable name does exist
+					if(variables.isInit(lineSplit[i])) { //If this returns false, then the variable was never initialized
+						printStatement += variables.getVariable(lineSplit[i]);
+					}
+					else {
+						System.out.println("Variable is not init");
+						break;
+					}
+				}
+				else {
+					System.out.println("Variable does not exist");
+					break;
+				}
+			}
+		}
+		return printStatement;
 	}
 	
 	private void runFile(Scanner input) {
@@ -48,7 +92,7 @@ public class JBasicRunner {
 				else if(lineSplit[0].toLowerCase().contains("str")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							variables.addString(lineSplit[1], lineSplit[3].substring(1, lineSplit[3].length() - 1)); // Add integer to container
+							variables.addString(lineSplit[1], processIntoString(lineSplit, 3)); // Add integer to container
 						}
 						else { //The variable was not initialized
 							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized int variable 
@@ -62,63 +106,62 @@ public class JBasicRunner {
 				}
 				// PRINT STATEMENTS
 				else if(lineSplit[0].toLowerCase().contains("print")) {
-					String printStatement = "";
-					// Loop through line and print all variables / statements in quotes
-					boolean midQuote = false;
-					for(int i = 1; i < lineSplit.length; i++) {
-						lineSplit[i] = lineSplit[i].trim();
-						if(lineSplit[i].equals("")) {
-							printStatement += " ";
-						}
-						else if(lineSplit[i].charAt(0) == '"' && lineSplit[i].length() > 1 && lineSplit[i].charAt(lineSplit[i].length() - 1) == '"') { //Then this is a one word quote, remove both
-							printStatement += lineSplit[i].substring(1, lineSplit[i].length() - 1);
-						}
-						else if(lineSplit[i].contains("\"")) { // Then this is a non var
-							midQuote = !midQuote;
-							if(midQuote) printStatement += lineSplit[i].substring(1) + " "; // The start of the quotes
-							else printStatement += lineSplit[i].substring(0, lineSplit[i].length() - 1); //At the end of the quotes
-						}
-						else if(midQuote) { //If we are mid quote, then its NOT a variable.
-							printStatement += lineSplit[i] + " "; // Add a space since split removed it
-						}
-						else { // This should be a var, verify.
-							if (variables.getVariable(lineSplit[i]) != null) { //If this is not null, than the variable name does exist
-								if(variables.isInit(lineSplit[i])) { //If this returns false, then the variable was never initialized
-									printStatement += variables.getVariable(lineSplit[i]);
-								}
-								else {
-									System.out.println("Variable is not init");
-									break;
-								}
-							}
-							else {
-								System.out.println("Variable does not exist");
-								break;
-							}
-						}
-					}
+					String printStatement = processIntoString(lineSplit, 1);
+					
 					if(!printStatement.equals(""))
 						System.out.println(printStatement);
 				}
 				else if(variables.getVariable(lineSplit[0]) != null) {
-					if(theLine.contains("+") || theLine.contains("-") || theLine.contains("*") || theLine.contains("/") || theLine.contains("%")) {
-						String expression = "";
-						for(String s : lineSplit) {
-							if(variables.getInteger(s) != null) {
-								expression += variables.getInteger(s).getValue() + "";
+					if(variables.getInteger(lineSplit[0]) != null) { //The value must be an int, process accordingly
+						if(theLine.contains("+") || theLine.contains("-") || theLine.contains("*") || theLine.contains("/") || theLine.contains("%")) {
+							String expression = "";
+							for(String s : lineSplit) {
+								if(variables.getInteger(s) != null) {
+									expression += variables.getInteger(s).getValue() + "";
+								}
+								else expression += s;
 							}
-							else expression += s;
+							expression = expression.substring(expression.indexOf("=") + 1, expression.length());
+							
+							InfixExpression ie = new InfixExpression(expression);
+							ie.getPostfixExpression();
+							variables.updateVariable(lineSplit[0], ie.evaluatePostfix() + "");
 						}
-						expression = expression.substring(expression.indexOf("=") + 1, expression.length());
-						
-						
-						InfixExpression ie = new InfixExpression(expression);
-						ie.getPostfixExpression();
-						variables.updateVariable(lineSplit[0], ie.evaluatePostfix() + "");
+						else {
+							variables.updateVariable(lineSplit[0], lineSplit[2]);	
+						}
 					}
-					else {
-						variables.updateVariable(lineSplit[0], lineSplit[2]);	
+					else if(variables.getString(lineSplit[0]) != null) {
+						if(theLine.contains(" - ")) {
+							if(theLine.contains(" = ")) { //Set the "removed" characters to the string
+								int subPos = theLine.lastIndexOf("-");
+								int value = Integer.parseInt(theLine.split("- ")[theLine.split("- ").length - 1]); //This gets the number to subtract
+								theLine = theLine.substring(0, subPos - 1);
+								lineSplit = theLine.split(" ");
+								String expression = processIntoString(lineSplit, 2);
+								if(value > expression.length()) value = expression.length();
+								expression = expression.substring(expression.length() - value, expression.length());
+								variables.updateVariable(lineSplit[0], expression);
+							}
+							else { //Remove that many characters
+								int subPos = theLine.lastIndexOf("-");
+								int value = Integer.parseInt(theLine.split("- ")[theLine.split("- ").length - 1]); //This gets the number to subtract
+								theLine = theLine.substring(0, subPos - 1);
+								lineSplit = theLine.split(" ");
+								String expression = processIntoString(lineSplit, 0);
+								if(value > expression.length()) value = expression.length();
+								expression = expression.substring(0, expression.length() - value);
+								variables.updateVariable(lineSplit[0], expression);		
+							}
+							
+						}
+						else {
+							String expression = theLine.substring(theLine.indexOf("=") + 1, theLine.length()).trim();
+							System.out.println("PASSING IN: " + expression + " FOR: " + lineSplit[0]);
+							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
+						}
 					}
+					else System.out.println("Invalid variable type");
 				}
 				else System.out.println("Unknown command at Line: " + lineCount);	
 			}
