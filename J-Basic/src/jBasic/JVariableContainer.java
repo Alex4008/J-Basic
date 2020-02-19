@@ -101,7 +101,11 @@ public class JVariableContainer {
 				}
 			}
 			else if(head.varType.equals("string")) {
-				head.string.setValue(newValue.substring(1, newValue.length() - 1));
+				if(newValue.contains("\""))
+					head.string.setValue(newValue.substring(1, newValue.length() - 1));
+				else
+					head.string.setValue(newValue);
+				
 				head.init = true;
 			}
 		}
@@ -120,7 +124,11 @@ public class JVariableContainer {
 					}
 				}
 				else if(head.varType.equals("string")) {//string updates
-					placeNode.string.setValue(newValue.substring(1, newValue.length() - 1));
+					if(newValue.contains("\""))
+						placeNode.string.setValue(newValue.substring(1, newValue.length() - 1));
+					else
+						placeNode.string.setValue(newValue);
+					
 					placeNode.init = true;
 				}
 			}
@@ -140,7 +148,11 @@ public class JVariableContainer {
 				}
 			}
 			else if(placeNode.varType.equals("string")) {
-				placeNode.string.setValue(newValue.substring(1, newValue.length() - 1));
+				if(newValue.contains("\""))
+					placeNode.string.setValue(newValue.substring(1, newValue.length() - 1));
+				else
+					placeNode.string.setValue(newValue);
+				
 				placeNode.init = true;
 			}
 		}
