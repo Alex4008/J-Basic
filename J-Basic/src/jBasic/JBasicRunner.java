@@ -101,7 +101,24 @@ public class JBasicRunner {
 						System.out.println(printStatement);
 				}
 				else if(variables.getVariable(lineSplit[0]) != null) {
-					variables.updateVariable(lineSplit[0], lineSplit[2]);
+					if(theLine.contains("+") || theLine.contains("-") || theLine.contains("*") || theLine.contains("/") || theLine.contains("%")) {
+						String expression = "";
+						for(String s : lineSplit) {
+							if(variables.getInteger(s) != null) {
+								expression += variables.getInteger(s).getValue() + "";
+							}
+							else expression += s;
+						}
+						expression = expression.substring(expression.indexOf("=") + 1, expression.length());
+						
+						
+						InfixExpression ie = new InfixExpression(expression);
+						ie.getPostfixExpression();
+						variables.updateVariable(lineSplit[0], ie.evaluatePostfix() + "");
+					}
+					else {
+						variables.updateVariable(lineSplit[0], lineSplit[2]);	
+					}
 				}
 				else System.out.println("Unknown command at Line: " + lineCount);	
 			}
