@@ -53,6 +53,9 @@ public class TextEditor extends JFrame {
 		scrollPane = new JScrollPane(textArea);
 		textAreaRegion.add(scrollPane);
 		this.add(textAreaRegion, BorderLayout.CENTER);
+		// Add J-BASIC VERSION to new file
+		textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
+		label.setText("Untitled.jb");
 	}
 
 	private void loadBtns() { 
@@ -98,14 +101,12 @@ public class TextEditor extends JFrame {
 	class NewButtonClick implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) {
-			textArea.setText("");
+			textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 			label.setText("Untitled.jb");
-
 		}
-
 	}
+	
 	class OpenButtonClick implements ActionListener {
-
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser opener = new JFileChooser();
 			opener.setCurrentDirectory(new File("."));

@@ -5,6 +5,7 @@ public class Main {
 	
 	// Global variables
 	static double version = 0.1;
+	static double languageVersion = 0.1;
 	static boolean enableGUI = true;
 	
 	static JFrame editor;
