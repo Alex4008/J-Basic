@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import Editor.Main;
+
 public class JBasicRunner {
 
 	JVariableContainer variables = new JVariableContainer();
@@ -69,6 +71,19 @@ public class JBasicRunner {
 			String theLine = input.nextLine();
 			String[] lineSplit = theLine.split(" "); // Split the line by " "
 			lineCount++; //Increment the line that we're on
+			
+			//J-Basic Version Reader
+			if(lineCount == 1 && theLine.charAt(1) == '#') {
+				double version = Double.parseDouble(lineSplit[3]);
+				if(version != Main.languageVersion) {
+					System.out.println("WARNING: Version Mismatch Warning,");
+					System.out.println("\tYour Version: " + version);
+					System.out.println("\tInterpreter Version: " + Main.languageVersion);
+					System.out.println("This mismatch could cause errors in your program.");
+					System.out.println("Continuing...\t");
+				}
+				continue;
+			}
 			
 			if(!theLine.equals("")) {
 				// INTEGERS
