@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -34,12 +36,10 @@ public class TextEditor extends JFrame {
 	private JTextArea textArea;
 	private JScrollPane scrollPane; 
 	private Label label;
-
-
+	
 	public TextEditor() {
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
 		loadBtns();
-		
 		// Create text area
 		textAreaRegion = new JPanel();
 		textArea = new JTextArea(55,77);
@@ -56,8 +56,31 @@ public class TextEditor extends JFrame {
 		// Add J-BASIC VERSION to new file
 		textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 		label.setText("Untitled.jb");
-	}
+		this.addWindowListener(new WindowAdapter()
+		{
+		    public void windowClosing(WindowEvent e)
+		    {
+				String saveFileLocation = label.getText();
+				//If its not the default file, save before close
+				if(!saveFileLocation.equals("Untitled.jb")) {
+					File file = new File(saveFileLocation);
+					try {
+						PrintWriter writer = new PrintWriter(file);
+						for(String line: textArea.getText().split("\n")) { 
+							writer.println(line); 
+						}
+						writer.close();
 
+					} catch (FileNotFoundException er) {
+						System.out.println("Error in TextEditor.Java");
+					}
+
+					label.setText(saveFileLocation);	
+				}
+		    }
+		});
+	}
+	
 	private void loadBtns() { 
 
 		buttonPanel = new JPanel();
@@ -196,7 +219,7 @@ public class TextEditor extends JFrame {
 
 				label.setText(saveFileLocation);
 				System.out.println("Running JBasic File " + saveFileLocation + ": ");
-				JBasicRunner runner = new JBasicRunner(saveFileLocation);
+				new JBasicRunner(saveFileLocation);
 			}
 		}
 	}
