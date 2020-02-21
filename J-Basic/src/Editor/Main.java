@@ -1,4 +1,5 @@
 package Editor;
+
 import javax.swing.JFrame;
 
 public class Main {
@@ -12,12 +13,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		if(args.length >= 1) enableGUI = false;
-		
 		editor = new TextEditor();
 		editor.setSize(900, 1000);
 		editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		editor.setVisible(true);
-		
 	}
-	
 }

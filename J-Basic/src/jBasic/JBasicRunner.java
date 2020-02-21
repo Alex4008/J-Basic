@@ -172,7 +172,6 @@ public class JBasicRunner {
 						}
 						else {
 							String expression = theLine.substring(theLine.indexOf("=") + 1, theLine.length()).trim();
-							System.out.println("PASSING IN: " + expression + " FOR: " + lineSplit[0]);
 							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
 						}
 					}
