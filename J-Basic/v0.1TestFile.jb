@@ -1,0 +1,36 @@
+## J-BASIC VERSION 0.1 ##
+int aInt = 5000
+
+string str = "This is an example of the features in J-Basic v0.1"
+
+print str
+
+print "You can print ints:"
+
+print aInt
+
+print "You can print ints and strings together"
+
+string newString = "test string"
+
+print aInt " " newString
+
+int num = 400
+
+print num 
+
+int newNum
+
+print "Full support for algebraic expressions"
+
+newNum = 4555 + 5 + 10 + num
+print newNum
+
+print "Substring / string concat"
+string test
+test = "this test" "remove me"
+print "Before: "
+print test
+print "After: "
+test - 9
+print test
