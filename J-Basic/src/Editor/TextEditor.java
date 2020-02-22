@@ -5,18 +5,26 @@ import java.awt.Font;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.OverlayLayout;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import jBasic.JBasicRunner;
 
 public class TextEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -31,13 +39,14 @@ public class TextEditor extends JFrame {
 	private JPanel textAreaRegion;
 	private JTextArea textArea;
 	private JScrollPane scrollPane; 
-	private Label label;
-
-
+	private JLabel label;
+	private JLabel versionWatermark;
+	
 	public TextEditor() {
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
+		ImageIcon img = new ImageIcon("icon.png");
+		this.setIconImage(img.getImage());
 		loadBtns();
-		
 		// Create text area
 		textAreaRegion = new JPanel();
 		textArea = new JTextArea(55,77);
@@ -51,8 +60,43 @@ public class TextEditor extends JFrame {
 		scrollPane = new JScrollPane(textArea);
 		textAreaRegion.add(scrollPane);
 		this.add(textAreaRegion, BorderLayout.CENTER);
-	}
+		// Add J-BASIC VERSION to new file
+		textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
+		label.setText("Untitled.jb");
+		this.addWindowListener(new WindowAdapter()
+		{
+		    public void windowClosing(WindowEvent e)
+		    {
+				String saveFileLocation = label.getText();
+				//If its not the default file, save before close
+				if(!saveFileLocation.equals("Untitled.jb")) {
+					File file = new File(saveFileLocation);
+					try {
+						PrintWriter writer = new PrintWriter(file);
+						for(String line: textArea.getText().split("\n")) { 
+							writer.println(line); 
+						}
+						writer.close();
 
+					} catch (FileNotFoundException er) {
+						System.out.println("Error in TextEditor.Java");
+					}
+
+					label.setText(saveFileLocation);	
+				}
+		    }
+		});
+	}
+	
+	public void openWebPage(String url){
+		   try {         
+		     java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+		   }
+		   catch (java.io.IOException e) {
+		       e.printStackTrace();
+		   }
+		}
+	
 	private void loadBtns() { 
 
 		buttonPanel = new JPanel();
@@ -85,25 +129,29 @@ public class TextEditor extends JFrame {
 		buttonPanel.add(btnOpen);
 		buttonPanel.add(btnSave);
 		buttonPanel.add(btnSaveAs);
-		bottomButtonPanel.add(btnRunProgram);
-		bottomButtonPanel.add(btnDoc);
 		
-		label = new Label();
+		label = new JLabel();
 		label.setText("No File Opened");
 		buttonPanel.add(label);
+		
+		versionWatermark = new JLabel();
+		versionWatermark.setText("\tJ-Basic Version: " + Main.languageVersion + "\t");
+		versionWatermark.setHorizontalAlignment(JLabel.LEFT);
+		versionWatermark.setVerticalAlignment(JLabel.BOTTOM);
+		bottomButtonPanel.add(btnRunProgram);
+		bottomButtonPanel.add(versionWatermark);
+		bottomButtonPanel.add(btnDoc);
 	}
 
 	class NewButtonClick implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) {
-			textArea.setText("");
+			textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 			label.setText("Untitled.jb");
-
 		}
-
 	}
+	
 	class OpenButtonClick implements ActionListener {
-
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser opener = new JFileChooser();
 			opener.setCurrentDirectory(new File("."));
@@ -142,7 +190,6 @@ public class TextEditor extends JFrame {
 	class SaveButtonClick implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) { 
-
 			if(label.getText() == "Untitled.jb") { 
 				newSave();	
 			}
@@ -167,7 +214,6 @@ public class TextEditor extends JFrame {
 	}
 
 	class SaveAsButtonClick implements ActionListener {
-
 		public void actionPerformed(ActionEvent arg0) {
 			newSave();
 		}
@@ -175,21 +221,34 @@ public class TextEditor extends JFrame {
 	
 	class RunProgramButtonClick implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			JOptionPane.showMessageDialog(Main.editor,
-				    "This feature is coming soon. For now, you can only save programs!",
-				    "Invalid Operation",
-				    JOptionPane.ERROR_MESSAGE);
-			System.out.println("Coming soon!");
+			// Save the file before running it
+			if(label.getText() == "Untitled.jb") { 
+				newSave();	
+			}
+			else { 
+				String saveFileLocation = label.getText();
+				File file = new File(saveFileLocation);
+				try {
+					PrintWriter writer = new PrintWriter(file);
+					for(String line: textArea.getText().split("\n")) { 
+						writer.println(line); 
+					}
+					writer.close();
+
+				} catch (FileNotFoundException e) {
+					System.out.println("Error in TextEditor.Java");
+				}
+
+				label.setText(saveFileLocation);
+				System.out.println("Running JBasic File " + saveFileLocation + ": ");
+				new JBasicRunner(saveFileLocation);
+			}
 		}
 	}
 	
 	class DocButtonClick implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			JOptionPane.showMessageDialog(Main.editor,
-				    "This feature is coming soon. This will link to my website showing J-Basic documentation",
-				    "Invalid Operation",
-				    JOptionPane.ERROR_MESSAGE);
-			System.out.println("Coming soon!");
+			openWebPage("https://github.com/Alex4008/J-Basic-Editor/blob/master/README.md#documentation");
 		}
 	}
 	
@@ -204,7 +263,6 @@ public class TextEditor extends JFrame {
 			if(!saveFileLocation.endsWith(".jb")) {
 				saveFileLocation += ".jb"; // Add the J-Basic extention
 			}
-			
 			File file = new File(saveFileLocation);
 			try {
 				PrintWriter writer = new PrintWriter(file);
@@ -215,7 +273,6 @@ public class TextEditor extends JFrame {
 			} catch (FileNotFoundException e) {
 				System.out.println("Error 2 TextEditor.java");
 			}
-
 			label.setText(file.getName());
 		}
 	}
