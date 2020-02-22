@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -42,6 +44,8 @@ public class TextEditor extends JFrame {
 	
 	public TextEditor() {
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
+		ImageIcon img = new ImageIcon("icon.png");
+		this.setIconImage(img.getImage());
 		loadBtns();
 		// Create text area
 		textAreaRegion = new JPanel();
