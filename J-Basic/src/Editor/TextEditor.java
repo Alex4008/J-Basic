@@ -88,6 +88,15 @@ public class TextEditor extends JFrame {
 		});
 	}
 	
+	public void openWebPage(String url){
+		   try {         
+		     java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+		   }
+		   catch (java.io.IOException e) {
+		       e.printStackTrace();
+		   }
+		}
+	
 	private void loadBtns() { 
 
 		buttonPanel = new JPanel();
@@ -239,11 +248,7 @@ public class TextEditor extends JFrame {
 	
 	class DocButtonClick implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			JOptionPane.showMessageDialog(Main.editor,
-				    "This feature is coming soon. This will link to my website showing J-Basic documentation",
-				    "Invalid Operation",
-				    JOptionPane.ERROR_MESSAGE);
-			System.out.println("Coming soon!");
+			openWebPage("https://github.com/Alex4008/J-Basic-Editor/blob/master/README.md#documentation");
 		}
 	}
 	
