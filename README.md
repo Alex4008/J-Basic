@@ -7,6 +7,11 @@ The interpreator reads in a series of JB (J-Basic) statements from a .JB file. I
 
 **Note:** This does not convert JB statements to Java code, rather it interpretes the JB statements real time and produces an output.
 
+### Running J-Basic
+Currently, in order to actually see the output of any of your J-Basic code, you'll need to run a .bat to get a console view. This will change in the future, but for now, the code below will run the v0.1 jar file.
+
+**java -Xmx256M -Xms256M -jar "J-Basic Editor v0.1.jar"**
+
 ## Documentation
 All documentation is for **J-Basic Version: 0.1**. Since this language is still in beta, there will be frequent changes to the core elements of the langauge. This documentation will reflect these changes as they appear.
 
