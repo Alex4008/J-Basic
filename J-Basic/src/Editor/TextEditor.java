@@ -14,10 +14,12 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.OverlayLayout;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import jBasic.JBasicRunner;
@@ -35,7 +37,8 @@ public class TextEditor extends JFrame {
 	private JPanel textAreaRegion;
 	private JTextArea textArea;
 	private JScrollPane scrollPane; 
-	private Label label;
+	private JLabel label;
+	private JLabel versionWatermark;
 	
 	public TextEditor() {
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
@@ -113,12 +116,18 @@ public class TextEditor extends JFrame {
 		buttonPanel.add(btnOpen);
 		buttonPanel.add(btnSave);
 		buttonPanel.add(btnSaveAs);
-		bottomButtonPanel.add(btnRunProgram);
-		bottomButtonPanel.add(btnDoc);
 		
-		label = new Label();
+		label = new JLabel();
 		label.setText("No File Opened");
 		buttonPanel.add(label);
+		
+		versionWatermark = new JLabel();
+		versionWatermark.setText("\tJ-Basic Version: " + Main.languageVersion + "\t");
+		versionWatermark.setHorizontalAlignment(JLabel.LEFT);
+		versionWatermark.setVerticalAlignment(JLabel.BOTTOM);
+		bottomButtonPanel.add(btnRunProgram);
+		bottomButtonPanel.add(versionWatermark);
+		bottomButtonPanel.add(btnDoc);
 	}
 
 	class NewButtonClick implements ActionListener {
