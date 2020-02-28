@@ -70,6 +70,11 @@ public class JBasicRunner {
 		while(input.hasNextLine()) {
 			String theLine = input.nextLine();
 			theLine = theLine.replace(';', ' ');
+			
+			//This code chunk will discard the part of the line which contains the comment.
+			String[] comments = theLine.split("//");
+			theLine = comments[0];
+			
 			String[] lineSplit = theLine.split(" "); // Split the line by " "
 			lineCount++; //Increment the line that we're on
 			
@@ -85,7 +90,7 @@ public class JBasicRunner {
 				}
 				continue;
 			}
-			
+
 			if(!theLine.equals("")) {
 				// INTEGERS
 				if(lineSplit[0].toLowerCase().equalsIgnoreCase("int") || lineSplit[0].toLowerCase().equalsIgnoreCase("integer")) {
