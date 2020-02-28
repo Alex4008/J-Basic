@@ -69,6 +69,7 @@ public class JBasicRunner {
 		int lineCount = 0;
 		while(input.hasNextLine()) {
 			String theLine = input.nextLine();
+			theLine = theLine.replace(';', ' ');
 			String[] lineSplit = theLine.split(" "); // Split the line by " "
 			lineCount++; //Increment the line that we're on
 			
