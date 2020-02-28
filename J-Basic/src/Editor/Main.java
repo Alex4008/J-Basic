@@ -5,8 +5,8 @@ import javax.swing.JFrame;
 public class Main {
 	
 	// Global variables
-	static double version = 0.1;
-	public static double languageVersion = 0.1;
+	static double version = 0.2;
+	public static double languageVersion = 0.2;
 	static boolean enableGUI = true;
 	
 	static JFrame editor;
