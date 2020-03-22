@@ -1,5 +1,7 @@
 package Editor;
 
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 
 public class Main {
@@ -14,7 +16,8 @@ public class Main {
 	public static void main(String[] args) {
 		if(args.length >= 1) enableGUI = false;
 		editor = new TextEditor();
-		editor.setSize(900, 1000);
+		editor.setSize(1225, 975);
+		editor.setMinimumSize(new Dimension(1225, 975));
 		editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		editor.setVisible(true);
 	}
