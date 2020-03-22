@@ -145,8 +145,24 @@ public class JBasicRunner {
 				if(lineSplit[0].toLowerCase().equalsIgnoreCase("int") || lineSplit[0].toLowerCase().equalsIgnoreCase("integer")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							int newVar = Integer.parseInt(lineSplit[3]); // Grab int value
-							variables.addInteger(lineSplit[1], newVar); // Add integer to container
+							
+							if(theLine.contains("+") || theLine.contains("-") || theLine.contains("*") || theLine.contains("/") || theLine.contains("%")) {
+								String expression = "";
+								for(String s : lineSplit) {
+									if(variables.getInteger(s) != null) {
+										expression += variables.getInteger(s).getValue() + "";
+									}
+									else expression += s;
+								}
+								expression = expression.substring(expression.indexOf("=") + 1, expression.length());
+								
+								InfixExpression ie = new InfixExpression(expression);
+								ie.getPostfixExpression();
+								variables.addInteger(lineSplit[1], ie.evaluatePostfix());
+							}
+							else {
+								variables.addInteger(lineSplit[1], Integer.parseInt(lineSplit[3]));	
+							}
 						}
 						else { //The variable was not initialized
 							variables.addUninitVar(lineSplit[1], 'i'); //Add uninitialized int variable 
