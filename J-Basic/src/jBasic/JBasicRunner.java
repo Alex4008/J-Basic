@@ -9,6 +9,7 @@ import Editor.Main;
 public class JBasicRunner {
 
 	JVariableContainer variables = new JVariableContainer();
+	boolean terminate = false;
 	
 	public JBasicRunner(String fileName) {
 		try {
@@ -18,6 +19,34 @@ public class JBasicRunner {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param errorCode (An integer that determines the error to display to the console.
+	 * @param lineCount (The current line of code that is being executed.
+	 */
+	private void throwError(int errorCode, int lineCount) {
+		terminate = true; // Enable termination of J-Basic code.
+		System.out.print("ERROR: ");
+		switch (errorCode) {
+		case -1:
+			System.out.print("Unknown Error");
+			break;
+		case 0:
+			System.out.print("Unknown Command");
+			break;
+		case 1:
+			System.out.print("Invalid Variable Type");
+			break;
+		case 2:
+			System.out.print("Integer Defined Error");
+			break;
+		case 3:
+			System.out.print("String Defined Error");
+			break;
+		}
+		System.out.print(" at Line " + lineCount + "\n");
 	}
 	
 	/**
@@ -67,7 +96,8 @@ public class JBasicRunner {
 	
 	private void runFile(Scanner input) {
 		int lineCount = 0;
-		while(input.hasNextLine()) {
+		terminate = false;
+		while(input.hasNextLine() && terminate == false) {
 			String theLine = input.nextLine();
 			theLine = theLine.replace(';', ' ');
 			
@@ -104,7 +134,7 @@ public class JBasicRunner {
 						}
 						
 					} catch (Exception e) {
-						System.out.println("int defined error");
+						throwError(2, lineCount);
 						e.printStackTrace();
 						break;
 					}	
@@ -120,7 +150,7 @@ public class JBasicRunner {
 						}
 						
 					} catch (Exception e) {
-						System.out.println("string defined error");
+						throwError(3, lineCount);
 						e.printStackTrace();
 						break;
 					}	
@@ -181,9 +211,9 @@ public class JBasicRunner {
 							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
 						}
 					}
-					else System.out.println("Invalid variable type");
+					else throwError(1, lineCount);
 				}
-				else System.out.println("Unknown command at Line: " + lineCount);	
+				else throwError(0, lineCount);
 			}
 		}
 	}
