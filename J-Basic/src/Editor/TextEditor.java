@@ -9,7 +9,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
@@ -108,6 +112,20 @@ public class TextEditor extends JFrame {
 		});
 	}
 	
+	public void writeToConsole(String statement) {
+		console.setText(console.getText() + "\n" + statement);
+		// This prevents the bottom scroll bar from appearing unless its needed
+		this.setSize(this.getSize().width + 1, this.getSize().height);
+		this.setSize(this.getSize().width - 1, this.getSize().height);
+	}
+	
+	private void clearConsole() {
+		console.setText("-- J-Basic Console v" + Main.version + " --");
+		// This prevents the bottom scroll bar from appearing unless its needed
+		this.setSize(this.getSize().width + 1, this.getSize().height);
+		this.setSize(this.getSize().width - 1, this.getSize().height);
+	}
+	
 	public void openWebPage(String url){
 		   try {         
 		     java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -168,6 +186,7 @@ public class TextEditor extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 			textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 			label.setText("Untitled.jb");
+			clearConsole(); //Clear the console when a new file is created
 		}
 	}
 	
@@ -189,6 +208,7 @@ public class TextEditor extends JFrame {
 							textArea.append("" + in.nextLine() + "\n");
 						}
 						in.close();
+						clearConsole(); //Clear the console when a new file is loaded
 					}
 					catch(FileNotFoundException e) {
 						System.out.println("File Not Found!");
@@ -260,8 +280,11 @@ public class TextEditor extends JFrame {
 				}
 
 				label.setText(saveFileLocation);
-				System.out.println("Running JBasic File " + saveFileLocation + ": ");
-				new JBasicRunner(saveFileLocation);
+				Date date = new Date();
+				SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+				clearConsole();
+				writeToConsole("Running " + saveFileLocation + ": Run time [" + formatter.format(date) + "]");
+				new JBasicRunner(saveFileLocation, editor);
 			}
 		}
 	}
