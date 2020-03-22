@@ -42,24 +42,44 @@ public class TextEditor extends JFrame {
 	private JLabel label;
 	private JLabel versionWatermark;
 	
+	private JPanel sidePanel;
+	private JTextArea console;
+	private JScrollPane consoleScrollPane;
+	
+	TextEditor editor;
+	
 	public TextEditor() {
+		editor = this;
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
 		ImageIcon img = new ImageIcon("icon.png");
 		this.setIconImage(img.getImage());
 		loadBtns();
 		// Create text area
 		textAreaRegion = new JPanel();
-		textArea = new JTextArea(55,77);
+		textArea = new JTextArea(50,60);
 		textArea.setEditable(true);
 		
 		Font font = new Font("Verdana", Font.PLAIN, 13);
-		textArea.setFont(font);
 		textArea.setForeground(Color.BLACK);
-		
 		textArea.setFont(font);
+		
 		scrollPane = new JScrollPane(textArea);
 		textAreaRegion.add(scrollPane);
-		this.add(textAreaRegion, BorderLayout.CENTER);
+		this.add(textAreaRegion, BorderLayout.WEST);
+		
+		//Create the console
+		sidePanel = new JPanel();
+		console = new JTextArea(15,45);
+		console.setEditable(false);
+		
+		console.setFont(font);
+		console.setForeground(Color.BLACK);
+		
+		consoleScrollPane = new JScrollPane(console);
+		sidePanel.add(consoleScrollPane);
+		this.add(sidePanel, BorderLayout.EAST);
+		clearConsole();
+		
 		// Add J-BASIC VERSION to new file
 		textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 		label.setText("Untitled.jb");
@@ -110,7 +130,7 @@ public class TextEditor extends JFrame {
 		btnSaveAs = new JButton();
 		btnRunProgram = new JButton();
 		btnDoc = new JButton();
-		
+
 		btnNew.setText("Create New File");
 		btnOpen.setText("Open Existing File");
 		btnSave.setText("Save File");
