@@ -11,8 +11,10 @@ import dataTypes.J_String;
  */
 public class JVariableContainer {
 	Node head;
+	JBasicRunner runner;
 	
-	JVariableContainer() {
+	JVariableContainer(JBasicRunner runner) {
+		this.runner = runner;
 		head = null;
 	}
 	
@@ -97,7 +99,7 @@ public class JVariableContainer {
 					head.init = true;
 				}
 				catch(Exception e) {
-					System.out.println("Type Mismatch Error");
+					runner.throwError(5); //Type mismatch error
 				}
 			}
 			else if(head.varType.equals("string")) {
@@ -120,7 +122,7 @@ public class JVariableContainer {
 						placeNode.init = true;
 					}
 					catch(Exception e) { //throw error
-						System.out.println("Type Mismatch Error");
+						runner.throwError(5); //Type mismatch error
 					}
 				}
 				else if(head.varType.equals("string")) {//string updates
@@ -144,7 +146,8 @@ public class JVariableContainer {
 					placeNode.init = true;
 				}
 				catch(Exception e) {
-					System.out.println("Type Mismatch Error");
+					runner.throwError(5); //Type mismatch error
+					
 				}
 			}
 			else if(placeNode.varType.equals("string")) {

@@ -9,8 +9,9 @@ import Editor.TextEditor;
 
 public class JBasicRunner {
 
-	JVariableContainer variables = new JVariableContainer();
+	JVariableContainer variables = new JVariableContainer(this);
 	boolean terminate = false;
+	int lineCount = 0;
 	TextEditor editor;
 	
 	public JBasicRunner(String fileName, TextEditor editor) {
@@ -29,7 +30,7 @@ public class JBasicRunner {
 	 * @param errorCode (An integer that determines the error to display to the console.
 	 * @param lineCount (The current line of code that is being executed.
 	 */
-	private void throwError(int errorCode, int lineCount) {
+	public void throwError(int errorCode) {
 		terminate = true; // Enable termination of J-Basic code.
 		String errorStatement = "ERROR: ";
 		switch (errorCode) {
@@ -47,6 +48,15 @@ public class JBasicRunner {
 			break;
 		case 3:
 			errorStatement += "String Defined Error";
+			break;
+		case 4:
+			errorStatement += "Variable Not Found Error";
+			break;
+		case 5:
+			errorStatement += "Type Mismatch Error";
+			break;
+		case 6:
+			errorStatement += "Variable Not Initialized Error";
 			break;
 		}
 		errorStatement += " at Line " + lineCount + "\n";
@@ -90,12 +100,12 @@ public class JBasicRunner {
 						printStatement += variables.getVariable(lineSplit[i]);
 					}
 					else {
-						System.out.println("Variable is not init");
+						throwError(6); //Error not initialized error
 						break;
 					}
 				}
 				else {
-					System.out.println("Variable does not exist");
+					throwError(4); //Variable not found error
 					break;
 				}
 			}
@@ -104,7 +114,7 @@ public class JBasicRunner {
 	}
 	
 	private void runFile(Scanner input) {
-		int lineCount = 0;
+		lineCount = 0;
 		terminate = false;
 		while(input.hasNextLine() && terminate == false) {
 			String theLine = input.nextLine();
@@ -143,7 +153,7 @@ public class JBasicRunner {
 						}
 						
 					} catch (Exception e) {
-						throwError(2, lineCount);
+						throwError(2);
 						e.printStackTrace();
 						break;
 					}	
@@ -159,7 +169,7 @@ public class JBasicRunner {
 						}
 						
 					} catch (Exception e) {
-						throwError(3, lineCount);
+						throwError(3);
 						e.printStackTrace();
 						break;
 					}	
@@ -220,9 +230,9 @@ public class JBasicRunner {
 							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
 						}
 					}
-					else throwError(1, lineCount);
+					else throwError(1);
 				}
-				else throwError(0, lineCount);
+				else throwError(0);
 			}
 		}
 	}
