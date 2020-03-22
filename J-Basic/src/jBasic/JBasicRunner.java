@@ -5,13 +5,16 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import Editor.Main;
+import Editor.TextEditor;
 
 public class JBasicRunner {
 
 	JVariableContainer variables = new JVariableContainer();
 	boolean terminate = false;
+	TextEditor editor;
 	
-	public JBasicRunner(String fileName) {
+	public JBasicRunner(String fileName, TextEditor editor) {
+		this.editor = editor;
 		try {
 			Scanner input = new Scanner(new File(fileName));
 			runFile(input);
@@ -28,25 +31,31 @@ public class JBasicRunner {
 	 */
 	private void throwError(int errorCode, int lineCount) {
 		terminate = true; // Enable termination of J-Basic code.
-		System.out.print("ERROR: ");
+		String errorStatement = "ERROR: ";
 		switch (errorCode) {
 		case -1:
-			System.out.print("Unknown Error");
+			errorStatement += "Unknown Error";
 			break;
 		case 0:
-			System.out.print("Unknown Command");
+			errorStatement += "Unknown Command";
 			break;
 		case 1:
-			System.out.print("Invalid Variable Type");
+			errorStatement += "Invalid Variable Type";
 			break;
 		case 2:
-			System.out.print("Integer Defined Error");
+			errorStatement += "Integer Defined Error";
 			break;
 		case 3:
-			System.out.print("String Defined Error");
+			errorStatement += "String Defined Error";
 			break;
 		}
-		System.out.print(" at Line " + lineCount + "\n");
+		errorStatement += " at Line " + lineCount + "\n";
+		printStatement(errorStatement);
+	}
+	
+	private void printStatement(String statement) {
+		editor.writeToConsole(statement);
+		System.out.println(statement);
 	}
 	
 	/**
@@ -112,11 +121,11 @@ public class JBasicRunner {
 			if(lineCount == 1 && theLine.charAt(1) == '#') {
 				double version = Double.parseDouble(lineSplit[3]);
 				if(version != Main.languageVersion) {
-					System.out.println("WARNING: Version Mismatch Warning,");
-					System.out.println("\tYour Version: " + version);
-					System.out.println("\tInterpreter Version: " + Main.languageVersion);
-					System.out.println("This mismatch could cause errors in your program.");
-					System.out.println("Continuing...\t");
+					printStatement("WARNING: Version Mismatch Warning,");
+					printStatement("\tYour Version: " + version);
+					printStatement("\tInterpreter Version: " + Main.languageVersion);
+					printStatement("This mismatch could cause errors in your program.");
+					printStatement("Continuing...\n");
 				}
 				continue;
 			}
@@ -160,7 +169,7 @@ public class JBasicRunner {
 					String printStatement = processIntoString(lineSplit, 1);
 					
 					if(!printStatement.equals(""))
-						System.out.println(printStatement);
+						printStatement(printStatement);
 				}
 				else if(variables.getVariable(lineSplit[0]) != null) {
 					if(variables.getInteger(lineSplit[0]) != null) { //The value must be an int, process accordingly
