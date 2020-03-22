@@ -261,7 +261,7 @@ public class TextEditor extends JFrame {
 		if(save.showSaveDialog(btnSave) == JFileChooser.APPROVE_OPTION) {
 			String saveFileLocation = save.getSelectedFile().getAbsolutePath();
 			if(!saveFileLocation.endsWith(".jb")) {
-				saveFileLocation += ".jb"; // Add the J-Basic extention
+				saveFileLocation += ".jb"; // Add the J-Basic extension
 			}
 			File file = new File(saveFileLocation);
 			try {
