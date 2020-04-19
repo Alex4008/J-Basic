@@ -2,6 +2,9 @@
 ### Description
 A made up interpretive language inspired by an assignment from [CSE 465](https://miamioh.edu/cec/academics/departments/cse/academics/course-descriptions/cse-465-565/index.html) at Miami University.
 
+### Download
+The latest version can be downloaded [here](https://www.mediafire.com/file/xlg4c9ydeg0geae/J-Basic_Editor_v0.2.jar/file)
+
 ### How it Works (TLDR)
 The interpreator reads in a series of JB (J-Basic) statements from a .JB file. It determines the variables and the methods to create via that JB file. From there is executes the JB file and runs the statements real time. 
 
