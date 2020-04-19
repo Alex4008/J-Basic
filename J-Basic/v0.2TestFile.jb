@@ -1,0 +1,31 @@
+## J-BASIC VERSION 0.2 ##
+// This is the first JB comment
+print "this is a test" ; //Semi colons have been fixed up. No matter what, it won't break the code
+
+int value = 55 + 4; //This bug is now fixed, it used to print 55 when it should've printed 59
+print value; //This is an example of a comment on the same line as a statement
+
+// If this file were to error out, it would no longer process any code after that error. Hurray!
+
+// Also, take a quick look at that fancy console to the right. Neat right?
+
+char aCharacter = A // Hey, there are chars now? Neat!
+
+char anotherCharacter = 'B' // You can also define them with or without the ''
+
+char oneMore
+
+oneMore = C // Of course, you can always init and define on seperate lines, as with all variables
+
+print aCharacter anotherCharacter oneMore // They also work in prints, exactly like strings
+
+string str = aCharacter anotherCharacter onemore "DEF" // You can also add chars to strings!
+
+print str
+
+//Lastly, lets see the new AT keyword:
+// Remember, indexing starts at 0, as it should in all languages. (looking at you MatLab)
+
+aCharacter = str AT 3 //This will return 'D' since that is the 3rd character in that string.
+
+print aCharacter
