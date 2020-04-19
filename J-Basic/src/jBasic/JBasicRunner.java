@@ -5,12 +5,17 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import Editor.Main;
+import Editor.TextEditor;
 
 public class JBasicRunner {
 
-	JVariableContainer variables = new JVariableContainer();
+	JVariableContainer variables = new JVariableContainer(this);
+	boolean terminate = false;
+	int lineCount = 0;
+	TextEditor editor;
 	
-	public JBasicRunner(String fileName) {
+	public JBasicRunner(String fileName, TextEditor editor) {
+		this.editor = editor;
 		try {
 			Scanner input = new Scanner(new File(fileName));
 			runFile(input);
@@ -18,6 +23,58 @@ public class JBasicRunner {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param errorCode (An integer that determines the error to display to the console.
+	 * @param lineCount (The current line of code that is being executed.
+	 */
+	public void throwError(int errorCode) {
+		terminate = true; // Enable termination of J-Basic code.
+		String errorStatement = "ERROR: ";
+		switch (errorCode) {
+		case -1:
+			errorStatement += "Unknown Error";
+			break;
+		case 0:
+			errorStatement += "Unknown Command";
+			break;
+		case 1:
+			errorStatement += "Invalid Variable Type";
+			break;
+		case 2:
+			errorStatement += "Integer Defined Error";
+			break;
+		case 3:
+			errorStatement += "String Defined Error";
+			break;
+		case 4:
+			errorStatement += "Variable Not Found Error";
+			break;
+		case 5:
+			errorStatement += "Type Mismatch Error";
+			break;
+		case 6:
+			errorStatement += "Variable Not Initialized Error";
+			break;
+		case 7:
+			errorStatement += "Character Defined Error";
+			break;
+		case 8:
+			errorStatement += "String used in AT statement not found";
+			break;
+		case 9:
+			errorStatement += "Location of AT is invalid";
+			break;
+		}
+		errorStatement += " at Line " + lineCount + "\n";
+		printStatement(errorStatement);
+	}
+	
+	private void printStatement(String statement) {
+		editor.writeToConsole(statement);
+		System.out.println(statement);
 	}
 	
 	/**
@@ -52,12 +109,12 @@ public class JBasicRunner {
 						printStatement += variables.getVariable(lineSplit[i]);
 					}
 					else {
-						System.out.println("Variable is not init");
+						throwError(6); //Error not initialized error
 						break;
 					}
 				}
 				else {
-					System.out.println("Variable does not exist");
+					throwError(4); //Variable not found error
 					break;
 				}
 			}
@@ -66,9 +123,16 @@ public class JBasicRunner {
 	}
 	
 	private void runFile(Scanner input) {
-		int lineCount = 0;
-		while(input.hasNextLine()) {
+		lineCount = 0;
+		terminate = false;
+		while(input.hasNextLine() && terminate == false) {
 			String theLine = input.nextLine();
+			theLine = theLine.replace(';', ' ');
+			
+			//This code chunk will discard the part of the line which contains the comment.
+			String[] comments = theLine.split("//");
+			theLine = comments[0];
+			
 			String[] lineSplit = theLine.split(" "); // Split the line by " "
 			lineCount++; //Increment the line that we're on
 			
@@ -76,29 +140,45 @@ public class JBasicRunner {
 			if(lineCount == 1 && theLine.charAt(1) == '#') {
 				double version = Double.parseDouble(lineSplit[3]);
 				if(version != Main.languageVersion) {
-					System.out.println("WARNING: Version Mismatch Warning,");
-					System.out.println("\tYour Version: " + version);
-					System.out.println("\tInterpreter Version: " + Main.languageVersion);
-					System.out.println("This mismatch could cause errors in your program.");
-					System.out.println("Continuing...\t");
+					printStatement("WARNING: Version Mismatch Warning,");
+					printStatement("\tYour Version: " + version);
+					printStatement("\tInterpreter Version: " + Main.languageVersion);
+					printStatement("This mismatch could cause errors in your program.");
+					printStatement("Continuing...\n");
 				}
 				continue;
 			}
-			
+
 			if(!theLine.equals("")) {
 				// INTEGERS
 				if(lineSplit[0].toLowerCase().equalsIgnoreCase("int") || lineSplit[0].toLowerCase().equalsIgnoreCase("integer")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							int newVar = Integer.parseInt(lineSplit[3]); // Grab int value
-							variables.addInteger(lineSplit[1], newVar); // Add integer to container
+							
+							if(theLine.contains("+") || theLine.contains("-") || theLine.contains("*") || theLine.contains("/") || theLine.contains("%")) {
+								String expression = "";
+								for(String s : lineSplit) {
+									if(variables.getInteger(s) != null) {
+										expression += variables.getInteger(s).getValue() + "";
+									}
+									else expression += s;
+								}
+								expression = expression.substring(expression.indexOf("=") + 1, expression.length());
+								
+								InfixExpression ie = new InfixExpression(expression);
+								ie.getPostfixExpression();
+								variables.addInteger(lineSplit[1], ie.evaluatePostfix());
+							}
+							else {
+								variables.addInteger(lineSplit[1], Integer.parseInt(lineSplit[3]));	
+							}
 						}
 						else { //The variable was not initialized
 							variables.addUninitVar(lineSplit[1], 'i'); //Add uninitialized int variable 
 						}
 						
 					} catch (Exception e) {
-						System.out.println("int defined error");
+						throwError(2);
 						e.printStackTrace();
 						break;
 					}	
@@ -107,24 +187,61 @@ public class JBasicRunner {
 				else if(lineSplit[0].toLowerCase().contains("str")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							variables.addString(lineSplit[1], processIntoString(lineSplit, 3)); // Add integer to container
+							variables.addString(lineSplit[1], processIntoString(lineSplit, 3)); // Add string to container
 						}
 						else { //The variable was not initialized
-							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized int variable 
+							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized string variable 
 						}
 						
 					} catch (Exception e) {
-						System.out.println("string defined error");
+						throwError(3);
 						e.printStackTrace();
 						break;
 					}	
+				}
+				// CHARS
+				else if(lineSplit[0].toLowerCase().equals("char")) {
+					try {
+						if(lineSplit.length > 2) { // in this case the variable was also initialized
+							char value = 0;
+							
+							if(theLine.toLowerCase().contains(" at ")) { //Handling AT keyword
+								try {
+									String takeFrom = variables.getString(theLine.split(" ")[3]).getValue();
+									value = takeFrom.charAt(Integer.parseInt(theLine.split(" ")[5]));
+								}
+								catch(NumberFormatException e) {
+									throwError(9);
+								}
+								catch (Exception e) {
+									throwError(8);
+								}
+							}
+							else if(lineSplit[3].contains("'")) {
+								if(lineSplit[3].length() == 1) //Then its a space, just trust me. Its a space
+									value = ' ';
+								else
+									value = lineSplit[3].charAt(1);
+							}
+							else
+								value = lineSplit[3].charAt(0);
+							variables.addCharacter(lineSplit[1], value); // Add character to container
+						}
+						else { //The variable was not initialized
+							variables.addUninitVar(lineSplit[1], 'c'); //Add uninitialized char variable 
+						}
+					} catch (Exception e) {
+						throwError(7); //When this error occurs, its more than likely someone tried to define a ' ' char without using the ' marks.
+						//e.printStackTrace();
+						break;
+					}
 				}
 				// PRINT STATEMENTS
 				else if(lineSplit[0].toLowerCase().contains("print")) {
 					String printStatement = processIntoString(lineSplit, 1);
 					
 					if(!printStatement.equals(""))
-						System.out.println(printStatement);
+						printStatement(printStatement);
 				}
 				else if(variables.getVariable(lineSplit[0]) != null) {
 					if(variables.getInteger(lineSplit[0]) != null) { //The value must be an int, process accordingly
@@ -175,9 +292,31 @@ public class JBasicRunner {
 							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
 						}
 					}
-					else System.out.println("Invalid variable type");
+					else if(variables.getCharacter(lineSplit[0]) != null) {
+						char value = 0;
+						if(theLine.toLowerCase().contains(" at ")) { //Handling AT keyword
+							try {
+								String takeFrom = variables.getString(theLine.split(" ")[2]).getValue();
+								value = takeFrom.charAt(Integer.parseInt(theLine.split(" ")[4]));
+							}
+							catch(NumberFormatException e) {
+								throwError(9);
+							}
+							catch (Exception e) {
+								throwError(8);
+							}
+						}
+						else {
+							if(theLine.split("\'").length == 2)  // For when '' are around the character
+								value = theLine.split("\'")[1].charAt(0);
+							else if(theLine.split("\'").length == 1)  // for when they're are not '' around the character
+								value = theLine.split(" ")[2].charAt(0);
+						}
+						variables.updateVariable(lineSplit[0], value + "");		
+					}
+					else throwError(1);
 				}
-				else System.out.println("Unknown command at Line: " + lineCount);	
+				else throwError(0);
 			}
 		}
 	}

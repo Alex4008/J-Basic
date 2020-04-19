@@ -9,7 +9,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
@@ -42,24 +46,44 @@ public class TextEditor extends JFrame {
 	private JLabel label;
 	private JLabel versionWatermark;
 	
+	private JPanel sidePanel;
+	private JTextArea console;
+	private JScrollPane consoleScrollPane;
+	
+	TextEditor editor;
+	
 	public TextEditor() {
+		editor = this;
 		this.setTitle("J-Basic Editor v" + Main.version + " - Developed By Alex Gray - 2020");
 		ImageIcon img = new ImageIcon("icon.png");
 		this.setIconImage(img.getImage());
 		loadBtns();
 		// Create text area
 		textAreaRegion = new JPanel();
-		textArea = new JTextArea(55,77);
+		textArea = new JTextArea(50,60);
 		textArea.setEditable(true);
 		
 		Font font = new Font("Verdana", Font.PLAIN, 13);
-		textArea.setFont(font);
 		textArea.setForeground(Color.BLACK);
-		
 		textArea.setFont(font);
+		
 		scrollPane = new JScrollPane(textArea);
 		textAreaRegion.add(scrollPane);
-		this.add(textAreaRegion, BorderLayout.CENTER);
+		this.add(textAreaRegion, BorderLayout.WEST);
+		
+		//Create the console
+		sidePanel = new JPanel();
+		console = new JTextArea(15,45);
+		console.setEditable(false);
+		
+		console.setFont(font);
+		console.setForeground(Color.BLACK);
+		
+		consoleScrollPane = new JScrollPane(console);
+		sidePanel.add(consoleScrollPane);
+		this.add(sidePanel, BorderLayout.EAST);
+		clearConsole();
+		
 		// Add J-BASIC VERSION to new file
 		textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 		label.setText("Untitled.jb");
@@ -88,6 +112,20 @@ public class TextEditor extends JFrame {
 		});
 	}
 	
+	public void writeToConsole(String statement) {
+		console.setText(console.getText() + "\n" + statement);
+		// This prevents the bottom scroll bar from appearing unless its needed
+		this.setSize(this.getSize().width + 1, this.getSize().height);
+		this.setSize(this.getSize().width - 1, this.getSize().height);
+	}
+	
+	private void clearConsole() {
+		console.setText("-- J-Basic Console v" + Main.version + " --");
+		// This prevents the bottom scroll bar from appearing unless its needed
+		this.setSize(this.getSize().width + 1, this.getSize().height);
+		this.setSize(this.getSize().width - 1, this.getSize().height);
+	}
+	
 	public void openWebPage(String url){
 		   try {         
 		     java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -110,7 +148,7 @@ public class TextEditor extends JFrame {
 		btnSaveAs = new JButton();
 		btnRunProgram = new JButton();
 		btnDoc = new JButton();
-		
+
 		btnNew.setText("Create New File");
 		btnOpen.setText("Open Existing File");
 		btnSave.setText("Save File");
@@ -148,6 +186,7 @@ public class TextEditor extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 			textArea.setText("## J-BASIC VERSION " + Main.languageVersion + " ##\n");
 			label.setText("Untitled.jb");
+			clearConsole(); //Clear the console when a new file is created
 		}
 	}
 	
@@ -169,6 +208,7 @@ public class TextEditor extends JFrame {
 							textArea.append("" + in.nextLine() + "\n");
 						}
 						in.close();
+						clearConsole(); //Clear the console when a new file is loaded
 					}
 					catch(FileNotFoundException e) {
 						System.out.println("File Not Found!");
@@ -240,8 +280,11 @@ public class TextEditor extends JFrame {
 				}
 
 				label.setText(saveFileLocation);
-				System.out.println("Running JBasic File " + saveFileLocation + ": ");
-				new JBasicRunner(saveFileLocation);
+				Date date = new Date();
+				SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+				clearConsole();
+				writeToConsole("Running " + saveFileLocation + ": Run time [" + formatter.format(date) + "]");
+				new JBasicRunner(saveFileLocation, editor);
 			}
 		}
 	}
@@ -261,7 +304,7 @@ public class TextEditor extends JFrame {
 		if(save.showSaveDialog(btnSave) == JFileChooser.APPROVE_OPTION) {
 			String saveFileLocation = save.getSelectedFile().getAbsolutePath();
 			if(!saveFileLocation.endsWith(".jb")) {
-				saveFileLocation += ".jb"; // Add the J-Basic extention
+				saveFileLocation += ".jb"; // Add the J-Basic extension
 			}
 			File file = new File(saveFileLocation);
 			try {
