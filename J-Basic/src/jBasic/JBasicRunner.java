@@ -58,6 +58,9 @@ public class JBasicRunner {
 		case 6:
 			errorStatement += "Variable Not Initialized Error";
 			break;
+		case 7:
+			errorStatement += "Character Defined Error";
+			break;
 		}
 		errorStatement += " at Line " + lineCount + "\n";
 		printStatement(errorStatement);
@@ -178,10 +181,10 @@ public class JBasicRunner {
 				else if(lineSplit[0].toLowerCase().contains("str")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							variables.addString(lineSplit[1], processIntoString(lineSplit, 3)); // Add integer to container
+							variables.addString(lineSplit[1], processIntoString(lineSplit, 3)); // Add string to container
 						}
 						else { //The variable was not initialized
-							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized int variable 
+							variables.addUninitVar(lineSplit[1], 's'); //Add uninitialized string variable 
 						}
 						
 					} catch (Exception e) {
@@ -189,6 +192,30 @@ public class JBasicRunner {
 						e.printStackTrace();
 						break;
 					}	
+				}
+				// CHARS
+				else if(lineSplit[0].toLowerCase().equals("char")) {
+					try {
+						if(lineSplit.length > 2) { // in this case the variable was also initialized
+							char value;
+							if(lineSplit[3].contains("'")) {
+								if(lineSplit[3].length() == 1) //Then its a space, just trust me. Its a space
+									value = ' ';
+								else
+									value = lineSplit[3].charAt(1);
+							}
+							else
+								value = lineSplit[3].charAt(0);
+							variables.addCharacter(lineSplit[1], value); // Add character to container
+						}
+						else { //The variable was not initialized
+							variables.addUninitVar(lineSplit[1], 'c'); //Add uninitialized char variable 
+						}
+					} catch (Exception e) {
+						throwError(7); //When this error occurs, its more than likely someone tried to define a ' ' char without using the ' marks.
+						//e.printStackTrace();
+						break;
+					}
 				}
 				// PRINT STATEMENTS
 				else if(lineSplit[0].toLowerCase().contains("print")) {
@@ -244,6 +271,16 @@ public class JBasicRunner {
 						else {
 							String expression = theLine.substring(theLine.indexOf("=") + 1, theLine.length()).trim();
 							variables.updateVariable(lineSplit[0], processIntoString(expression.split(" "), 0));	
+						}
+					}
+					else if(variables.getCharacter(lineSplit[0]) != null) {
+						if(theLine.split("\'").length == 2) { // For when '' are around the character
+							char value = theLine.split("\'")[1].charAt(0);
+							variables.updateVariable(lineSplit[0], value + "");		
+						}
+						else if(theLine.split("\'").length == 1) { // for when they're are not '' around the character
+							char value = theLine.split(" ")[2].charAt(0);
+							variables.updateVariable(lineSplit[0], value + "");	
 						}
 					}
 					else throwError(1);
