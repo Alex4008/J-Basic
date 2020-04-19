@@ -61,6 +61,12 @@ public class JBasicRunner {
 		case 7:
 			errorStatement += "Character Defined Error";
 			break;
+		case 8:
+			errorStatement += "String used in AT statement not found";
+			break;
+		case 9:
+			errorStatement += "Location of AT is invalid";
+			break;
 		}
 		errorStatement += " at Line " + lineCount + "\n";
 		printStatement(errorStatement);
@@ -197,8 +203,21 @@ public class JBasicRunner {
 				else if(lineSplit[0].toLowerCase().equals("char")) {
 					try {
 						if(lineSplit.length > 2) { // in this case the variable was also initialized
-							char value;
-							if(lineSplit[3].contains("'")) {
+							char value = 0;
+							
+							if(theLine.toLowerCase().contains(" at ")) { //Handling AT keyword
+								try {
+									String takeFrom = variables.getString(theLine.split(" ")[3]).getValue();
+									value = takeFrom.charAt(Integer.parseInt(theLine.split(" ")[5]));
+								}
+								catch(NumberFormatException e) {
+									throwError(9);
+								}
+								catch (Exception e) {
+									throwError(8);
+								}
+							}
+							else if(lineSplit[3].contains("'")) {
 								if(lineSplit[3].length() == 1) //Then its a space, just trust me. Its a space
 									value = ' ';
 								else
@@ -274,14 +293,26 @@ public class JBasicRunner {
 						}
 					}
 					else if(variables.getCharacter(lineSplit[0]) != null) {
-						if(theLine.split("\'").length == 2) { // For when '' are around the character
-							char value = theLine.split("\'")[1].charAt(0);
-							variables.updateVariable(lineSplit[0], value + "");		
+						char value = 0;
+						if(theLine.toLowerCase().contains(" at ")) { //Handling AT keyword
+							try {
+								String takeFrom = variables.getString(theLine.split(" ")[2]).getValue();
+								value = takeFrom.charAt(Integer.parseInt(theLine.split(" ")[4]));
+							}
+							catch(NumberFormatException e) {
+								throwError(9);
+							}
+							catch (Exception e) {
+								throwError(8);
+							}
 						}
-						else if(theLine.split("\'").length == 1) { // for when they're are not '' around the character
-							char value = theLine.split(" ")[2].charAt(0);
-							variables.updateVariable(lineSplit[0], value + "");	
+						else {
+							if(theLine.split("\'").length == 2)  // For when '' are around the character
+								value = theLine.split("\'")[1].charAt(0);
+							else if(theLine.split("\'").length == 1)  // for when they're are not '' around the character
+								value = theLine.split(" ")[2].charAt(0);
 						}
+						variables.updateVariable(lineSplit[0], value + "");		
 					}
 					else throwError(1);
 				}
